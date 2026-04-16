@@ -532,12 +532,16 @@ async function reverseGeocode(lat, lon) {
     const r = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`);
     const d = await r.json();
     const addr = d.address || {};
-    // Prefer water body names, then neighborhood, then city
     const name = addr.bay || addr.water || addr.waterway || addr.natural ||
                  addr.leisure || addr.suburb || addr.neighbourhood ||
-                 addr.village || addr.town || addr.city_district || addr.city;
+                 addr.village || addr.town || addr.city_district || addr.city ||
+                 addr.county || addr.state;
     if (name) return name;
-    // Clean coordinate fallback
+    // Use Nominatim's display_name, take just the first segment
+    if (d.display_name) {
+      const first = d.display_name.split(',')[0].trim();
+      if (first && first.length < 40) return first;
+    }
     const latStr = (lat >= 0 ? lat.toFixed(4)+'°N' : Math.abs(lat).toFixed(4)+'°S');
     const lonStr = (lon >= 0 ? lon.toFixed(4)+'°E' : Math.abs(lon).toFixed(4)+'°W');
     return `${latStr}, ${lonStr}`;
@@ -1027,8 +1031,11 @@ function dl(url,filename){const a=document.createElement('a');a.href=url;a.downl
 // ═══════════════════════════════════════════════════
 function checkInstallBanner(){
   const dismissed=localStorage.getItem('install_dismissed');
+  const visits=parseInt(localStorage.getItem('visit_count')||'0')+1;
+  localStorage.setItem('visit_count', visits);
   const isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent);
-  if(isIOS&&!window.navigator.standalone&&!dismissed)document.getElementById('install-banner').className='install-banner show';
+  const isStandalone=window.navigator.standalone||window.matchMedia('(display-mode: standalone)').matches;
+  if(isIOS&&!isStandalone&&!dismissed&&visits<=2)document.getElementById('install-banner').className='install-banner show';
 }
 function dismissInstall(){localStorage.setItem('install_dismissed','1');document.getElementById('install-banner').className='install-banner';}
 
