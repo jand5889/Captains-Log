@@ -88,6 +88,13 @@ border-bottom: 1px solid var(--line-soft);
 .vstat-label { font-family: var(--mono); font-size: 7px; color: var(--ink3); text-transform: uppercase; letter-spacing: 0.1em; margin-top: 3px; }
 .voyage-banner-loc { padding: 8px 14px 10px; font-size: 12px; color: var(--ink2); }
 .voyage-banner-loc span { color: var(--ink3); font-family: var(--mono); font-size: 9px; text-transform: uppercase; letter-spacing: 0.1em; margin-right: 6px; }
+.voyage-marks { padding: 0 14px 8px; font-size: 11px; color: var(--amber); font-family: var(--mono); }
+.voyage-marks.has-mob { color: var(--coral); }
+.voyage-mark-row { display: flex; gap: 8px; padding: 0 14px 12px; }
+.mark-btn { flex: 1; background: rgba(45,212,191,0.1); border: 1px solid var(--teal-dim); color: var(--teal); padding: 10px; border-radius: 10px; font-family: var(--body); font-weight: 600; font-size: 12.5px; cursor: pointer; -webkit-appearance: none; }
+.mark-btn:active { background: rgba(45,212,191,0.2); }
+.mob-btn { flex: 1; background: var(--coral); border: none; color: #2a0e0a; padding: 10px; border-radius: 10px; font-family: var(--display); font-weight: 700; font-size: 13px; cursor: pointer; -webkit-appearance: none; letter-spacing: 0.03em; }
+.mob-btn:active { background: #e8503f; }
 .voyage-banner-actions { display: flex; gap: 0; border-top: 1px solid var(--line-soft); }
 .make-port-btn {
 flex: 1;
@@ -214,6 +221,15 @@ transition: transform 0.15s, box-shadow 0.15s;
 .badge { font-family: var(--mono); font-size: 7px; background: var(--bg-elev2); color: var(--ink3); padding: 3px 7px; border-radius: 20px; letter-spacing: 0.06em; text-transform: uppercase; border: 1px solid var(--line); }
 .badge.commercial { border-color: var(--teal-dim); color: var(--teal); background: rgba(45,212,191,0.08); }
 .badge.gps { border-color: #1e6b4a; color: var(--green); background: rgba(52,211,153,0.08); }
+.badge.marks { border-color: #7a5a1e; color: var(--amber); background: rgba(240,180,41,0.08); }
+.badge.mob { border-color: var(--coral-dim); color: var(--coral); background: rgba(255,107,91,0.1); }
+.waypoint-list { margin-top: 6px; }
+.waypoint-row { display: flex; align-items: baseline; gap: 7px; font-size: 11.5px; padding: 3px 0; }
+.waypoint-row .wp-time { font-family: var(--mono); font-size: 9px; color: var(--ink4); flex-shrink: 0; }
+.waypoint-row .wp-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.waypoint-row .wp-dot.spot { background: var(--amber); }
+.waypoint-row .wp-dot.mob { background: var(--coral); }
+.waypoint-row .wp-label { color: var(--ink2); }
 .entry-meta { font-size: 12px; color: var(--ink2); margin-bottom: 3px; }
 .entry-catch { font-family: var(--mono); font-size: 9px; color: var(--ink3); letter-spacing: 0.02em; }
 .entry-chevron { color: var(--ink4); font-size: 13px; padding-top: 4px; }
@@ -226,8 +242,11 @@ transition: transform 0.15s, box-shadow 0.15s;
 .entry-actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
 
 /* TRACK MAP */
-.track-map { margin: 8px 0 10px; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: var(--bg); }
-.track-map svg { display: block; width: 100%; }
+.track-map-wrap { margin: 8px 0 10px; }
+.track-map-inner { position: relative; overflow: hidden; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); margin: 0 auto; }
+.track-map-inner img { position: absolute; width: 256px; height: 256px; display: block; }
+.track-overlay { position: absolute; top: 0; left: 0; pointer-events: none; }
+.track-map-attrib { font-family: var(--mono); font-size: 7px; color: var(--ink4); text-align: right; margin-top: 3px; padding-right: 2px; }
 
 /* FORM */
 .form-title { font-family: var(--display); font-weight: 700; font-size: 20px; color: var(--ink); text-align: center; margin-bottom: 18px; padding-bottom: 14px; border-bottom: 1px solid var(--line); }
@@ -269,6 +288,20 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.9) brig
 /* BACKUP VIEW */
 .backup-view { display: none; }
 .backup-view.active { display: block; }
+
+/* SPOTS LINK + VIEW */
+.spots-link { width: 100%; background: rgba(240,180,41,0.08); border: 1px solid #7a5a1e; color: var(--amber); padding: 10px; border-radius: 12px; font-family: var(--body); font-weight: 600; font-size: 12.5px; cursor: pointer; -webkit-appearance: none; margin-bottom: 14px; }
+.spots-view { display: none; }
+.spots-view.active { display: block; }
+.spot-card { background: var(--bg-elev); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; margin-bottom: 8px; }
+.spot-card.mob { border-color: var(--coral-dim); }
+.spot-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 4px; }
+.spot-label { font-family: var(--body); font-weight: 600; font-size: 13.5px; color: var(--ink); }
+.spot-label .mob-tag { color: var(--coral); }
+.spot-meta { font-family: var(--mono); font-size: 9px; color: var(--ink3); margin-bottom: 8px; }
+.spot-actions { display: flex; gap: 6px; }
+.spot-actions .ghost-btn { padding: 5px 10px; font-size: 11px; }
+.spots-empty { text-align: center; padding: 50px 0; color: var(--ink3); font-size: 13px; }
 .backup-status-card { background: var(--bg-elev); border: 1px solid var(--line); border-radius: 12px; padding: 14px; margin-bottom: 16px; }
 .backup-status-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
 .backup-status-row:last-child { margin-bottom: 0; }
@@ -327,6 +360,11 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.9) brig
         <div class="vstat"><div class="vstat-val" id="live-pts">0</div><div class="vstat-label">GPS points</div></div>
       </div>
       <div class="voyage-banner-loc" id="voyage-loc"><span>FROM</span>Loading position...</div>
+      <div class="voyage-marks" id="voyage-marks" style="display:none"></div>
+      <div class="voyage-mark-row">
+        <button class="mark-btn" onclick="markWaypoint('spot')">📍 Mark</button>
+        <button class="mob-btn" onclick="markWaypoint('mob')">🆘 MOB</button>
+      </div>
       <div class="voyage-banner-actions">
         <button class="make-port-btn" onclick="makePort()">End Voyage</button>
         <button class="discard-btn" onclick="discardVoyage()">Discard</button>
@@ -336,10 +374,16 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.9) brig
     <!-- CAST OFF BUTTON -->
     <div class="castoff-wrap" id="castoff-wrap">
       <button class="castoff-btn" onclick="castOff()">⚓ Cast Off</button>
+      <div class="check-row" style="margin-top:10px" onclick="toggleBatterySaver()">
+        <div class="check-box" id="battery-saver-check"></div>
+        <div class="check-label">Battery Saver — lower GPS precision, less drain (applies next voyage)</div>
+      </div>
     </div>
 
     <div class="stats-grid" id="stats-grid"></div>
     <div class="progress-card" id="progress-card"></div>
+
+    <button class="spots-link" id="spots-link" onclick="showView('spots')" style="display:none">📍 All Spots</button>
 
     <div class="section-head">
       <div class="section-line"></div>
@@ -510,6 +554,14 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.9) brig
     <div class="safe-bottom"></div>
   </div>
 
+  <!-- SPOTS VIEW -->
+  <div class="spots-view" id="spots-view">
+    <div class="form-title">All Spots</div>
+    <div id="spots-list"></div>
+    <button class="cancel-btn" onclick="showView('log')">Done</button>
+    <div class="safe-bottom"></div>
+  </div>
+
 </div>
 
 <div class="toast" id="toast"></div>
@@ -528,10 +580,12 @@ const GH_REPO = 'Captains-Log';
 const GH_DATA_PATH = 'data/entries.json';
 const GH_TOKEN_KEY = 'gh_backup_token_v1';
 const GH_LASTBACKUP_KEY = 'gh_last_backup_v1';
+const BATTERY_SAVER_KEY = 'battery_saver_v1';
 let ghSha = null; // tracks current remote file sha for safe updates
 let backupChain = Promise.resolve(); // serializes backup calls
 
 let entries = [], editingId = null, isCommercial = false, filterWaters = 'All', expandedId = null;
+let editingExtras = null; // preserves an existing entry's track/waypoints while it's being edited
 
 // Active voyage state
 let voyage = null;       // { startTime, track:[], startLoc, startCoords }
@@ -629,6 +683,32 @@ function dateStr(ts) {
 }
 
 // ═══════════════════════════════════════════════════
+//  BATTERY SAVER
+// ═══════════════════════════════════════════════════
+function getBatterySaver(){ try{return localStorage.getItem(BATTERY_SAVER_KEY)==='1';}catch{return false;} }
+function setBatterySaverUI(){
+  const el=document.getElementById('battery-saver-check');
+  if(el) el.className='check-box'+(getBatterySaver()?' checked':'');
+}
+function toggleBatterySaver(){
+  const on=!getBatterySaver();
+  try{localStorage.setItem(BATTERY_SAVER_KEY, on?'1':'');}catch{}
+  setBatterySaverUI();
+  toast(on?'Battery Saver on — applies next voyage':'Battery Saver off');
+}
+// Lower-power fixes trade GPS precision for far less radio/battery use.
+function gpsWatchOptions(){
+  return getBatterySaver()
+    ? { enableHighAccuracy: false, maximumAge: 45000, timeout: 60000 }
+    : { enableHighAccuracy: true,  maximumAge: 10000, timeout: 30000 };
+}
+function gpsFixOptions(){
+  return getBatterySaver()
+    ? { enableHighAccuracy: false, timeout: 25000 }
+    : { enableHighAccuracy: true,  timeout: 15000 };
+}
+
+// ═══════════════════════════════════════════════════
 //  CAST OFF — start tracking
 // ═══════════════════════════════════════════════════
 function castOff() {
@@ -668,7 +748,7 @@ function castOff() {
       gpsWatchId = navigator.geolocation.watchPosition(
         onGpsUpdate,
         onGpsError,
-        { enableHighAccuracy: true, maximumAge: 10000, timeout: 30000 }
+        gpsWatchOptions()
       );
 
       // Clock ticker
@@ -682,7 +762,7 @@ function castOff() {
         alert('Unable to get GPS fix. Make sure you have a clear view of the sky.');
       }
     },
-    { enableHighAccuracy: true, timeout: 15000 }
+    gpsFixOptions()
   );
 }
 
@@ -720,6 +800,59 @@ function updateVoyageBanner() {
   if (voyage.startLoc && voyage.startLoc !== 'Locating...') {
     document.getElementById('voyage-loc').innerHTML = `<span>FROM</span>${voyage.startLoc}`;
   }
+
+  const marksEl = document.getElementById('voyage-marks');
+  const wps = voyage.waypoints || [];
+  if (wps.length) {
+    const mobCount = wps.filter(w=>w.type==='mob').length;
+    marksEl.style.display = 'block';
+    marksEl.className = 'voyage-marks' + (mobCount ? ' has-mob' : '');
+    marksEl.textContent = mobCount
+      ? `🆘 ${mobCount} MOB · 📍 ${wps.length} total marks`
+      : `📍 ${wps.length} spot${wps.length===1?'':'s'} marked`;
+  } else {
+    marksEl.style.display = 'none';
+  }
+}
+
+// ═══════════════════════════════════════════════════
+//  MARK WAYPOINT — fishing spots, hazards, man overboard
+// ═══════════════════════════════════════════════════
+function markWaypoint(type) {
+  if (!voyage) return;
+  if (!navigator.geolocation) { toast('GPS not available', true); return; }
+
+  const finish = (lat, lon) => {
+    let label = 'Man Overboard';
+    if (type !== 'mob') {
+      const raw = prompt('Label this spot (optional):', '');
+      if (raw === null) return; // user hit Cancel — don't record a mark at all
+      label = raw.trim() || 'Marked Spot';
+    }
+    voyage.waypoints = voyage.waypoints || [];
+    voyage.waypoints.push({ lat, lon, t: Date.now(), type, label });
+    saveVoyage();
+    updateVoyageBanner();
+    if (navigator.vibrate) navigator.vibrate(type==='mob' ? [200,100,200,100,200] : 70);
+    toast(type==='mob' ? `MAN OVERBOARD marked — ${timeStr(Date.now())}` : `Marked: ${label}`, false);
+  };
+
+  // MOB always uses a fresh high-accuracy fix regardless of Battery Saver — this one matters.
+  const opts = type==='mob' ? { enableHighAccuracy:true, timeout:10000, maximumAge:0 } : gpsFixOptions();
+
+  navigator.geolocation.getCurrentPosition(
+    pos => finish(pos.coords.latitude, pos.coords.longitude),
+    () => {
+      // If a live fix fails, fall back to the most recent tracked point rather than losing the mark.
+      if (voyage.track && voyage.track.length) {
+        const last = voyage.track[voyage.track.length-1];
+        finish(last.lat, last.lon);
+      } else {
+        toast('Could not get a GPS fix for the mark', true);
+      }
+    },
+    opts
+  );
 }
 
 // ═══════════════════════════════════════════════════
@@ -743,6 +876,7 @@ function makePort() {
     startLoc: voyage.startLoc,
     waters,
     track: voyage.track,
+    waypoints: voyage.waypoints || [],
   };
 
   voyage = null;
@@ -778,6 +912,7 @@ function stopTracking() {
 function openFormFromVoyage(vd) {
   editingId = null;
   isCommercial = false;
+  editingExtras = null;
 
   document.getElementById('form-title').textContent = 'New Log Entry';
   document.getElementById('gps-prefill').className = 'gps-prefill show';
@@ -810,11 +945,13 @@ function showView(v) {
   document.getElementById('log-view').className = 'log-view' + (v==='log'?' active':'');
   document.getElementById('form-view').className = 'form-view' + (v==='form'?' active':'');
   document.getElementById('backup-view').className = 'backup-view' + (v==='backup'?' active':'');
+  document.getElementById('spots-view').className = 'spots-view' + (v==='spots'?' active':'');
   document.getElementById('btn-log').className = 'btn' + (v==='log'?' active':'');
   document.getElementById('btn-backup').className = 'btn' + (v==='backup'?' active':'');
   if (v==='log') { editingId=null; renderAll(); restoreVoyageBanner(); }
-  if (v==='form' || v==='backup') window.scrollTo(0,0);
+  if (v==='form' || v==='backup' || v==='spots') window.scrollTo(0,0);
   if (v==='backup') refreshBackupPanel();
+  if (v==='spots') renderSpots();
 }
 
 function restoreVoyageBanner() {
@@ -829,7 +966,7 @@ function restoreVoyageBanner() {
 }
 
 function newEntry() {
-  editingId=null; isCommercial=false;
+  editingId=null; isCommercial=false; editingExtras=null;
   document.getElementById('form-title').textContent = 'New Log Entry';
   document.getElementById('gps-prefill').className = 'gps-prefill';
   const today = new Date().toISOString().split('T')[0];
@@ -846,6 +983,7 @@ function newEntry() {
 function editEntry(id) {
   const e = entries.find(x=>x.id===id); if(!e) return;
   editingId=id; isCommercial=e.commercial||false;
+  editingExtras = { track: e.track||null, waypoints: e.waypoints||[] };
   document.getElementById('form-title').textContent = 'Edit Log Entry';
   document.getElementById('gps-prefill').className = 'gps-prefill';
   document.getElementById('f-date').value=e.date||'';
@@ -918,11 +1056,17 @@ function saveEntry(){
     notes:document.getElementById('f-notes').value,
   };
 
-  // Attach track if coming from a voyage
+  // Attach GPS track + waypoints: prefer a fresh voyage just ended, otherwise
+  // preserve whatever the entry already had (editing a past entry shouldn't wipe its track).
   if (pendingVoyageData && pendingVoyageData.track) {
     entry.track = pendingVoyageData.track;
+    entry.waypoints = pendingVoyageData.waypoints || [];
     pendingVoyageData = null;
+  } else if (editingExtras) {
+    if (editingExtras.track) entry.track = editingExtras.track;
+    if (editingExtras.waypoints && editingExtras.waypoints.length) entry.waypoints = editingExtras.waypoints;
   }
+  editingExtras = null;
 
   if(editingId){const idx=entries.findIndex(x=>x.id===editingId);if(idx>=0)entries[idx]=entry;}
   else entries.unshift(entry);
@@ -1075,7 +1219,75 @@ function refreshBackupPanel(){
 // ═══════════════════════════════════════════════════
 //  RENDER
 // ═══════════════════════════════════════════════════
-function renderAll(){renderStats();renderProgress();renderFilters();renderEntries();}
+function renderAll(){renderStats();renderProgress();renderFilters();renderEntries();updateSpotsLink();}
+
+function getAllWaypoints(){
+  const out=[];
+  entries.forEach(e=>(e.waypoints||[]).forEach(w=>out.push({...w, entryId:e.id, entryDate:e.date})));
+  return out.sort((a,b)=>b.t-a.t);
+}
+
+function updateSpotsLink(){
+  const all=getAllWaypoints();
+  const link=document.getElementById('spots-link');
+  if(!link) return;
+  if(all.length){
+    link.style.display='block';
+    link.textContent=`📍 All Spots (${all.length})`;
+  } else {
+    link.style.display='none';
+  }
+}
+
+function renderSpots(){
+  const all=getAllWaypoints();
+  const container=document.getElementById('spots-list');
+  if(!all.length){
+    container.innerHTML='<div class="spots-empty">No spots marked yet.<br><small>Tap 📍 Mark while underway to start building this list.</small></div>';
+    return;
+  }
+  container.innerHTML=all.map(w=>{
+    const isMob=w.type==='mob';
+    return `<div class="spot-card${isMob?' mob':''}">
+      <div class="spot-top">
+        <div class="spot-label">${isMob?'<span class="mob-tag">🆘 </span>':'📍 '}${esc(w.label||'Marked Spot')}</div>
+      </div>
+      <div class="spot-meta">${formatDate(w.entryDate)} · ${esc(timeStr(w.t))} · ${w.lat.toFixed(4)}, ${w.lon.toFixed(4)}</div>
+      <div class="spot-actions">
+        <button class="ghost-btn" onclick="goToSpotTrip(${w.entryId})">Go to Trip</button>
+        <button class="ghost-btn" onclick="renameWaypoint(${w.entryId},${w.t})">Rename</button>
+        <button class="ghost-btn danger" onclick="deleteWaypoint(${w.entryId},${w.t})">Remove</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function goToSpotTrip(entryId){
+  expandedId=entryId;
+  filterWaters='All';
+  showView('log');
+  renderAll();
+  requestAnimationFrame(()=>{
+    const el=document.getElementById('card-'+entryId);
+    if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
+  });
+}
+
+function renameWaypoint(entryId, ts){
+  const e=entries.find(x=>x.id===entryId); if(!e||!e.waypoints) return;
+  const w=e.waypoints.find(x=>x.t===ts); if(!w) return;
+  const newLabel=prompt('Rename this spot:', w.label||'');
+  if(newLabel===null) return;
+  w.label = newLabel.trim() || w.label;
+  save(); queueBackup(); renderSpots();
+}
+
+function deleteWaypoint(entryId, ts){
+  if(!confirm('Remove this mark? This cannot be undone.')) return;
+  const e=entries.find(x=>x.id===entryId); if(!e||!e.waypoints) return;
+  e.waypoints=e.waypoints.filter(w=>w.t!==ts);
+  save(); queueBackup(); renderSpots(); updateSpotsLink();
+}
 
 function renderStats(){
   const total=entries.length;
@@ -1117,29 +1329,81 @@ function renderFilters(){
 }
 function setFilter(w){filterWaters=w;renderFilters();renderEntries();}
 
-// Draw GPS track as simple SVG
-function buildTrackSVG(track) {
+// Web Mercator tile math — converts lon/lat to "world pixel" coords at a given zoom.
+// (These scale exactly linearly with 2^zoom, which is what makes the fit-to-bounds math below work.)
+function lon2worldX(lon, zoom){ return (lon+180)/360 * Math.pow(2,zoom) * 256; }
+function lat2worldY(lat, zoom){
+  const r = lat*Math.PI/180;
+  return (1 - Math.log(Math.tan(r)+1/Math.cos(r))/Math.PI)/2 * Math.pow(2,zoom) * 256;
+}
+
+// Draw GPS track over real OpenStreetMap tiles, auto-zoomed/centered to fit the track.
+function buildTrackMap(track, waypoints) {
   if (!track || track.length < 2) return '';
-  const lats = track.map(p=>p.lat), lons = track.map(p=>p.lon);
+  waypoints = waypoints || [];
+  const TARGET_W=300, TARGET_H=190, PAD_FRAC=0.78; // PAD_FRAC = how much of the box the bbox should fill
+  const boundsPts = track.concat(waypoints);
+  const lats=boundsPts.map(p=>p.lat), lons=boundsPts.map(p=>p.lon);
   const minLat=Math.min(...lats), maxLat=Math.max(...lats);
   const minLon=Math.min(...lons), maxLon=Math.max(...lons);
-  const W=280, H=80, pad=10;
-  const latRange=maxLat-minLat||0.001, lonRange=maxLon-minLon||0.001;
-  const toX=lon=>pad+(lon-minLon)/lonRange*(W-2*pad);
-  const toY=lat=>H-pad-(lat-minLat)/latRange*(H-2*pad);
-  const pts=track.map(p=>`${toX(p.lon).toFixed(1)},${toY(p.lat).toFixed(1)}`).join(' ');
-  const start=track[0], end=track[track.length-1];
-  return `<div class="track-map">
-    <svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">
-      <rect width="${W}" height="${H}" fill="#0a1620"/>
-      <line x1="${pad}" y1="${H/2}" x2="${W-pad}" y2="${H/2}" stroke="#22394a" stroke-width="0.5"/>
-      <line x1="${W/2}" y1="${pad}" x2="${W/2}" y2="${H-pad}" stroke="#22394a" stroke-width="0.5"/>
-      <polyline points="${pts}" fill="none" stroke="#2dd4bf" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
-      <circle cx="${toX(start.lon).toFixed(1)}" cy="${toY(start.lat).toFixed(1)}" r="5" fill="#2dd4bf"/>
-      <circle cx="${toX(end.lon).toFixed(1)}" cy="${toY(end.lat).toFixed(1)}" r="5" fill="#ff6b5b"/>
-      <text x="${pad+2}" y="${H-3}" font-size="7" fill="#3d5c6e" font-family="monospace">start</text>
-      <text x="${W-pad-22}" y="${H-3}" font-size="7" fill="#6e4a44" font-family="monospace">end</text>
-    </svg>
+
+  // Width/height of the bbox in world px at zoom 0 (scales linearly with 2^zoom from here)
+  const w0 = Math.max(lon2worldX(maxLon,0)-lon2worldX(minLon,0), 0.000001);
+  const h0 = Math.max(lat2worldY(minLat,0)-lat2worldY(maxLat,0), 0.000001); // lat2worldY decreases as lat increases
+
+  let zoom = Math.floor(Math.min(
+    Math.log2((TARGET_W*PAD_FRAC)/w0),
+    Math.log2((TARGET_H*PAD_FRAC)/h0)
+  ));
+  zoom = Math.max(3, Math.min(18, isFinite(zoom)?zoom:15));
+
+  const centerLon=(minLon+maxLon)/2, centerLat=(minLat+maxLat)/2;
+  const centerPx={x:lon2worldX(centerLon,zoom), y:lat2worldY(centerLat,zoom)};
+  const originX = centerPx.x - TARGET_W/2;
+  const originY = centerPx.y - TARGET_H/2;
+
+  const n = Math.pow(2,zoom);
+  const tileMinX=Math.floor(originX/256), tileMaxX=Math.floor((originX+TARGET_W)/256);
+  const tileMinY=Math.max(0,Math.floor(originY/256)), tileMaxY=Math.min(n-1,Math.floor((originY+TARGET_H)/256));
+
+  let tiles='';
+  for(let ty=tileMinY; ty<=tileMaxY; ty++){
+    for(let tx=tileMinX; tx<=tileMaxX; tx++){
+      const wrappedX=((tx%n)+n)%n;
+      const left=(tx*256-originX).toFixed(1), top=(ty*256-originY).toFixed(1);
+      tiles+=`<img src="https://tile.openstreetmap.org/${zoom}/${wrappedX}/${ty}.png" style="left:${left}px;top:${top}px" loading="lazy" alt="">`;
+    }
+  }
+
+  const toPx=p=>({x:lon2worldX(p.lon,zoom)-originX, y:lat2worldY(p.lat,zoom)-originY});
+  const pts=track.map(p=>{const c=toPx(p);return `${c.x.toFixed(1)},${c.y.toFixed(1)}`;}).join(' ');
+  const start=toPx(track[0]), end=toPx(track[track.length-1]);
+
+  const wpMarkers = waypoints.map(w=>{
+    const c=toPx(w);
+    const isMob = w.type==='mob';
+    const r = isMob ? 6.5 : 5;
+    const fill = isMob ? '#ff6b5b' : '#f0b429';
+    const label = esc(w.label||'');
+    return `<g>
+      <circle cx="${c.x.toFixed(1)}" cy="${c.y.toFixed(1)}" r="${r}" fill="${fill}" stroke="#0a1620" stroke-width="1.5">
+        <title>${label}</title>
+      </circle>
+      ${isMob?`<text x="${c.x.toFixed(1)}" y="${(c.y+3).toFixed(1)}" font-size="7" fill="#0a1620" font-family="sans-serif" text-anchor="middle" font-weight="700">!</text>`:''}
+    </g>`;
+  }).join('');
+
+  return `<div class="track-map-wrap">
+    <div class="track-map-inner" style="width:${TARGET_W}px;height:${TARGET_H}px">
+      ${tiles}
+      <svg class="track-overlay" width="${TARGET_W}" height="${TARGET_H}" viewBox="0 0 ${TARGET_W} ${TARGET_H}">
+        <polyline points="${pts}" fill="none" stroke="#2dd4bf" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" style="filter:drop-shadow(0 0 2px rgba(0,0,0,0.8))"/>
+        <circle cx="${start.x.toFixed(1)}" cy="${start.y.toFixed(1)}" r="5.5" fill="#2dd4bf" stroke="#06211c" stroke-width="1.5"/>
+        <circle cx="${end.x.toFixed(1)}" cy="${end.y.toFixed(1)}" r="5.5" fill="#ff6b5b" stroke="#2a0e0a" stroke-width="1.5"/>
+        ${wpMarkers}
+      </svg>
+    </div>
+    <div class="track-map-attrib">© OpenStreetMap contributors</div>
   </div>`;
 }
 
@@ -1154,9 +1418,15 @@ function renderEntries(){
     const exp=expandedId===e.id;
     const catchStr=(e.catch||[]).filter(c=>c.species).map(c=>`${c.species}${c.count?' ('+c.count+')':''}`).join(' · ');
     const hasTrack = e.track && e.track.length > 1;
+    const waypoints = e.waypoints || [];
+    const hasMob = waypoints.some(w=>w.type==='mob');
+    const waypointList = waypoints.length ? `
+        <div class="waypoint-list">
+          ${waypoints.map(w=>`<div class="waypoint-row"><span class="wp-dot ${w.type==='mob'?'mob':'spot'}"></span><span class="wp-time">${esc(timeStr(w.t))}</span><span class="wp-label">${w.type==='mob'?'🆘 ':''}${esc(w.label||'')}</span></div>`).join('')}
+        </div>` : '';
     const detail=exp?`
       <div class="entry-detail">
-        ${hasTrack ? buildTrackSVG(e.track) : ''}
+        ${hasTrack ? buildTrackMap(e.track, waypoints) : ''}
         ${e.startTime?`<div class="detail-row"><div class="detail-label">Time</div><div class="detail-val">${esc(e.startTime)}${e.endTime?' → '+esc(e.endTime):''}</div></div>`:''}
         ${e.startLoc?`<div class="detail-row"><div class="detail-label">From</div><div class="detail-val">${esc(e.startLoc)}</div></div>`:''}
         ${e.distance?`<div class="detail-row"><div class="detail-label">Distance</div><div class="detail-val">${esc(e.distance)} NM</div></div>`:''}
@@ -1167,6 +1437,7 @@ function renderEntries(){
         ${e.traps?`<div class="detail-row"><div class="detail-label">Traps</div><div class="detail-val">${esc(e.traps)}</div></div>`:''}
         ${(e.fuel||e.gearCost)?`<div class="detail-row"><div class="detail-label">Expenses</div><div class="detail-val">Fuel: $${e.fuel||'0'} · Gear: $${e.gearCost||'0'}</div></div>`:''}
         ${e.notes?`<div class="detail-row"><div class="detail-label">Notes</div><div class="detail-val">${esc(e.notes)}</div></div>`:''}
+        ${waypoints.length?`<div class="detail-row"><div class="detail-label">Marks</div><div class="detail-val">${waypointList}</div></div>`:''}
         <div class="entry-actions">
           <button class="ghost-btn" onclick="editEntry(${e.id})">Edit</button>
           <button class="ghost-btn danger" onclick="deleteEntry(${e.id})">Delete</button>
@@ -1180,6 +1451,7 @@ function renderEntries(){
               <div class="entry-date">${formatDate(e.date)}</div>
               ${e.commercial?'<div class="badge commercial">Commercial</div>':''}
               ${hasTrack?'<div class="badge gps">GPS</div>':''}
+              ${hasMob?'<div class="badge mob">🆘 MOB</div>':(waypoints.length?`<div class="badge marks">📍 ${waypoints.length}</div>`:'')}
             </div>
             <div class="entry-meta">${esc(e.waters)} · ${e.hours}h${e.distance?' · '+e.distance+' NM':''} · ${esc(e.vessel)}</div>
             ${catchStr?`<div class="entry-catch">${esc(catchStr)}</div>`:''}
@@ -1203,13 +1475,17 @@ function esc(str){if(!str)return'';return String(str).replace(/&/g,'&amp;').repl
 // ═══════════════════════════════════════════════════
 function exportCSV(){
   if(!entries.length){alert('No entries to export.');return;}
-  const headers=['Date','Start Time','End Time','Vessel','FL Reg #','Waters','Role','Hours Underway','Start Location','Distance (NM)','Others Aboard','Catch Species','Catch Count','Catch Weight (lbs)','Gear Used','Trap Activity','Commercial Trip','Fuel Cost ($)','Gear Cost ($)','GPS Track Points','Notes'];
+  const headers=['Date','Start Time','End Time','Vessel','FL Reg #','Waters','Role','Hours Underway','Start Location','Distance (NM)','Others Aboard','Catch Species','Catch Count','Catch Weight (lbs)','Gear Used','Trap Activity','Commercial Trip','Fuel Cost ($)','Gear Cost ($)','GPS Track Points','MOB Event','Spots Marked','Mark Labels','Notes'];
   const rows=entries.map(e=>{
     const cs=(e.catch||[]).map(c=>c.species).filter(Boolean).join(' | ');
     const cc=(e.catch||[]).map(c=>c.count).filter(Boolean).join(' | ');
     const cw=(e.catch||[]).map(c=>c.weight).filter(Boolean).join(' | ');
     const trackPts=e.track?e.track.length:0;
-    return[e.date,e.startTime||'',e.endTime||'',e.vessel,e.reg,e.waters,e.role,e.hours,e.startLoc||'',e.distance||'',e.crew,cs,cc,cw,e.gear,e.traps,e.commercial?'Yes':'No',e.fuel,e.gearCost,trackPts,e.notes]
+    const wps=e.waypoints||[];
+    const mobFlag=wps.some(w=>w.type==='mob')?'Yes':'No';
+    const spotCount=wps.filter(w=>w.type!=='mob').length;
+    const markLabels=wps.map(w=>`${timeStr(w.t)} ${w.type==='mob'?'MOB':w.label||'Spot'}`).join(' | ');
+    return[e.date,e.startTime||'',e.endTime||'',e.vessel,e.reg,e.waters,e.role,e.hours,e.startLoc||'',e.distance||'',e.crew,cs,cc,cw,e.gear,e.traps,e.commercial?'Yes':'No',e.fuel,e.gearCost,trackPts,mobFlag,spotCount,markLabels,e.notes]
       .map(v=>{const s=(v==null)?'':String(v);return s.includes(',')||s.includes('"')||s.includes('\n')?'"'+s.replace(/"/g,'""')+'"':s;});
   });
   const csv=[headers,...rows].map(r=>r.join(',')).join('\n');
@@ -1244,6 +1520,7 @@ renderAll();
 checkInstallBanner();
 updateBackupDot(getGhToken() ? 'ok' : 'off');
 refreshBackupPanel();
+setBatterySaverUI();
 
 // If local storage is empty but a GitHub backup exists, pull it in automatically.
 // If local storage already has entries but no token is set up yet, this is a no-op
@@ -1261,8 +1538,7 @@ if (voyage) {
   updateVoyageBanner();
   // Resume GPS watch
   if (navigator.geolocation) {
-    gpsWatchId = navigator.geolocation.watchPosition(onGpsUpdate, onGpsError,
-      { enableHighAccuracy: true, maximumAge: 10000, timeout: 30000 });
+    gpsWatchId = navigator.geolocation.watchPosition(onGpsUpdate, onGpsError, gpsWatchOptions());
     clockInterval = setInterval(updateVoyageBanner, 5000);
   }
 }
