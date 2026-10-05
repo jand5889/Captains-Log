@@ -52,6 +52,10 @@ body {
 .header-eyebrow { font-family: var(--mono); font-size: 9px; letter-spacing: 0.14em; color: var(--teal-dim); text-transform: uppercase; margin-bottom: 2px; }
 .header-title { font-family: var(--display); font-weight: 700; font-size: 21px; color: var(--ink); line-height: 1; }
 .header-nav { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
+.backup-dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; margin-left: 5px; vertical-align: middle; }
+.backup-dot.ok { background: var(--green); }
+.backup-dot.warn { background: var(--amber); }
+.backup-dot.off { background: var(--ink4); }
 
 .header-divider { height: 1px; background: linear-gradient(90deg, transparent, var(--line) 15%, var(--line) 85%, transparent); }
 
@@ -261,6 +265,21 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.9) brig
 .cancel-btn { width: 100%; background: transparent; border: 1px solid var(--line); color: var(--ink3); padding: 12px; font-family: var(--body); font-size: 13px; cursor: pointer; border-radius: 14px; -webkit-appearance: none; }
 
 .safe-bottom { height: env(safe-area-inset-bottom, 20px); }
+
+/* BACKUP VIEW */
+.backup-view { display: none; }
+.backup-view.active { display: block; }
+.backup-status-card { background: var(--bg-elev); border: 1px solid var(--line); border-radius: 12px; padding: 14px; margin-bottom: 16px; }
+.backup-status-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.backup-status-row:last-child { margin-bottom: 0; }
+.backup-status-label { font-family: var(--mono); font-size: 9px; color: var(--ink3); text-transform: uppercase; letter-spacing: 0.08em; }
+.backup-status-val { font-size: 12px; color: var(--ink); }
+.backup-help { font-size: 12px; color: var(--ink2); line-height: 1.6; margin-bottom: 14px; }
+.backup-help a { color: var(--teal); }
+.backup-help ol { padding-left: 18px; margin-top: 6px; }
+.toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--bg-elev3); border: 1px solid var(--teal-dim); color: var(--ink); padding: 10px 18px; border-radius: 10px; font-size: 12px; font-family: var(--body); opacity: 0; pointer-events: none; transition: opacity 0.25s, transform 0.25s; z-index: 999; max-width: 85vw; text-align: center; box-shadow: 0 8px 24px rgba(0,0,0,0.4); }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.toast.error { border-color: var(--coral-dim); }
 </style>
 
 </head>
@@ -274,7 +293,7 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.9) brig
     </div>
     <div class="header-nav">
       <button class="btn active" id="btn-log" onclick="showView('log')">Log</button>
-      <button class="btn export" onclick="exportCSV()">CSV</button>
+      <button class="btn" id="btn-backup" onclick="showView('backup')">⚙<span class="backup-dot off" id="backup-dot"></span></button>
       <button class="btn primary" id="btn-new" onclick="newEntry()">+ Entry</button>
     </div>
   </div>
@@ -450,7 +469,50 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.9) brig
 
   </div>
 
+  <!-- BACKUP VIEW -->
+  <div class="backup-view" id="backup-view">
+    <div class="form-title">Backup &amp; Sync</div>
+
+    <div class="backup-status-card">
+      <div class="backup-status-row"><span class="backup-status-label">Last Backup</span><span class="backup-status-val" id="backup-last">Never</span></div>
+      <div class="backup-status-row"><span class="backup-status-label">Status</span><span class="backup-status-val" id="backup-state">Not set up</span></div>
+      <div class="backup-status-row"><span class="backup-status-label">Entries Backed Up</span><span class="backup-status-val" id="backup-count">0 / 0</span></div>
+    </div>
+
+    <div class="form-section">
+      <div class="form-section-label">Automatic Off-Device Backup</div>
+      <div class="backup-help">
+        Every time you save or delete an entry, your full log is pushed to a private data file in your GitHub repo — off your phone, so a lost or wiped device can't take it with it. Restoring reads that file back automatically, no token needed.
+        <ol>
+          <li>Go to <strong>github.com/settings/tokens?type=beta</strong> in Safari</li>
+          <li>Generate new token → name it "Captains Log Backup"</li>
+          <li>Repository access → <strong>Only select repositories</strong> → choose <strong>Captains-Log</strong></li>
+          <li>Permissions → <strong>Contents: Read and write</strong></li>
+          <li>Generate, copy the token, paste it below</li>
+        </ol>
+      </div>
+      <div class="form-field" style="margin-bottom:10px">
+        <label class="form-label">GitHub Access Token</label>
+        <input type="password" id="gh-token-input" placeholder="github_pat_...">
+      </div>
+      <button class="ghost-btn" onclick="saveGhToken()" style="margin-right:8px">Save Token</button>
+      <button class="ghost-btn danger" onclick="clearGhToken()">Remove Token</button>
+    </div>
+
+    <div class="form-section">
+      <div class="form-section-label">Manual Actions</div>
+      <button class="save-btn" onclick="manualBackup()" style="margin-bottom:8px">Back Up Now</button>
+      <button class="ghost-btn" onclick="manualRestore()" style="margin-bottom:8px">Restore From Backup</button>
+      <button class="ghost-btn" onclick="exportCSV()">Export CSV</button>
+    </div>
+
+    <button class="cancel-btn" onclick="showView('log')">Done</button>
+    <div class="safe-bottom"></div>
+  </div>
+
 </div>
+
+<div class="toast" id="toast"></div>
 
 <script>
 // ═══════════════════════════════════════════════════
@@ -459,6 +521,15 @@ input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.9) brig
 const STORAGE_KEY = 'captains_log_v1';
 const VOYAGE_KEY  = 'active_voyage_v1';
 const WATERS = ['ICW','Nearshore Gulf','Offshore Gulf','Tampa Bay','Boca Ciega Bay','Other'];
+
+// Off-device backup (GitHub-backed)
+const GH_OWNER = 'jand5889';
+const GH_REPO = 'Captains-Log';
+const GH_DATA_PATH = 'data/entries.json';
+const GH_TOKEN_KEY = 'gh_backup_token_v1';
+const GH_LASTBACKUP_KEY = 'gh_last_backup_v1';
+let ghSha = null; // tracks current remote file sha for safe updates
+let backupChain = Promise.resolve(); // serializes backup calls
 
 let entries = [], editingId = null, isCommercial = false, filterWaters = 'All', expandedId = null;
 
@@ -738,9 +809,12 @@ function openFormFromVoyage(vd) {
 function showView(v) {
   document.getElementById('log-view').className = 'log-view' + (v==='log'?' active':'');
   document.getElementById('form-view').className = 'form-view' + (v==='form'?' active':'');
+  document.getElementById('backup-view').className = 'backup-view' + (v==='backup'?' active':'');
   document.getElementById('btn-log').className = 'btn' + (v==='log'?' active':'');
+  document.getElementById('btn-backup').className = 'btn' + (v==='backup'?' active':'');
   if (v==='log') { editingId=null; renderAll(); restoreVoyageBanner(); }
-  if (v==='form') window.scrollTo(0,0);
+  if (v==='form' || v==='backup') window.scrollTo(0,0);
+  if (v==='backup') refreshBackupPanel();
 }
 
 function restoreVoyageBanner() {
@@ -853,11 +927,149 @@ function saveEntry(){
   if(editingId){const idx=entries.findIndex(x=>x.id===editingId);if(idx>=0)entries[idx]=entry;}
   else entries.unshift(entry);
   save(); showView('log');
+  queueBackup();
 }
 
 function deleteEntry(id){
   if(!confirm('Delete this entry from the log?'))return;
   entries=entries.filter(x=>x.id!==id); save(); expandedId=null; renderAll();
+  queueBackup();
+}
+
+// ═══════════════════════════════════════════════════
+//  OFF-DEVICE BACKUP (GitHub-backed)
+// ═══════════════════════════════════════════════════
+function getGhToken(){ try{return localStorage.getItem(GH_TOKEN_KEY)||'';}catch{return '';} }
+function setGhToken(t){ try{ t?localStorage.setItem(GH_TOKEN_KEY,t):localStorage.removeItem(GH_TOKEN_KEY); }catch{} }
+function getLastBackup(){ try{return localStorage.getItem(GH_LASTBACKUP_KEY)||'';}catch{return '';} }
+function setLastBackup(iso){ try{localStorage.setItem(GH_LASTBACKUP_KEY,iso);}catch{} }
+
+function b64EncodeUnicode(str){
+  return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g,(m,p)=>String.fromCharCode('0x'+p)));
+}
+function b64DecodeUnicode(b64){
+  return decodeURIComponent(atob(b64).split('').map(c=>'%'+('00'+c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+}
+
+function toast(msg, isError){
+  const el=document.getElementById('toast');
+  if(!el) return;
+  el.textContent=msg;
+  el.className='toast show'+(isError?' error':'');
+  clearTimeout(toast._t);
+  toast._t=setTimeout(()=>{el.className='toast';},3200);
+}
+
+// Queue backups so rapid saves don't race each other / corrupt the remote sha
+function queueBackup(){
+  backupChain = backupChain.then(()=>syncToGitHub(true)).catch(()=>{});
+}
+
+async function syncToGitHub(silent){
+  const token=getGhToken();
+  if(!token){ updateBackupDot('off'); return; }
+  updateBackupDot('warn');
+  try{
+    const url=`https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/${GH_DATA_PATH}`;
+    // Fetch current sha if we don't have it yet
+    if(ghSha===null){
+      const getRes=await fetch(url,{headers:{Authorization:`token ${token}`,Accept:'application/vnd.github+json'}});
+      if(getRes.status===200){ const j=await getRes.json(); ghSha=j.sha; }
+      else if(getRes.status===404){ ghSha=undefined; }
+      else throw new Error('Could not reach backup file (HTTP '+getRes.status+')');
+    }
+    const body={
+      message:`Backup ${entries.length} entries — ${new Date().toISOString()}`,
+      content:b64EncodeUnicode(JSON.stringify(entries,null,2)),
+    };
+    if(ghSha) body.sha=ghSha;
+    const putRes=await fetch(url,{
+      method:'PUT',
+      headers:{Authorization:`token ${token}`,Accept:'application/vnd.github+json','Content-Type':'application/json'},
+      body:JSON.stringify(body)
+    });
+    if(!putRes.ok){
+      const errJ=await putRes.json().catch(()=>({}));
+      throw new Error(errJ.message||('HTTP '+putRes.status));
+    }
+    const putJ=await putRes.json();
+    ghSha=putJ.content.sha;
+    setLastBackup(new Date().toISOString());
+    updateBackupDot('ok');
+    if(!silent) toast(`Backed up ${entries.length} entries`);
+    refreshBackupPanel();
+  }catch(err){
+    updateBackupDot('warn');
+    if(!silent) toast('Backup failed: '+err.message, true);
+  }
+}
+
+async function restoreFromGitHub(silent){
+  try{
+    const url=`https://raw.githubusercontent.com/${GH_OWNER}/${GH_REPO}/main/${GH_DATA_PATH}?t=${Date.now()}`;
+    const res=await fetch(url);
+    if(res.status===404){
+      if(!silent) toast('No backup found yet', true);
+      return false;
+    }
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    const remote=await res.json();
+    if(!Array.isArray(remote)) throw new Error('Backup file looks invalid');
+    entries=remote;
+    save();
+    renderAll();
+    if(!silent) toast(`Restored ${remote.length} entries from backup`);
+    refreshBackupPanel();
+    return true;
+  }catch(err){
+    if(!silent) toast('Restore failed: '+err.message, true);
+    return false;
+  }
+}
+
+function manualBackup(){
+  if(!getGhToken()){ toast('Add a GitHub token first', true); return; }
+  ghSha=null; // force a fresh sha check in case the remote file changed elsewhere
+  syncToGitHub(false);
+}
+
+function manualRestore(){
+  if(!confirm('This will replace everything currently in the app with the backed-up version. Continue?')) return;
+  restoreFromGitHub(false);
+}
+
+function saveGhToken(){
+  const v=document.getElementById('gh-token-input').value.trim();
+  if(!v){ toast('Paste a token first', true); return; }
+  setGhToken(v);
+  ghSha=null;
+  document.getElementById('gh-token-input').value='';
+  toast('Token saved — backing up now...');
+  syncToGitHub(false);
+}
+
+function clearGhToken(){
+  if(!confirm('Remove the saved backup token? Automatic backups will stop until you add a new one.')) return;
+  setGhToken('');
+  ghSha=null;
+  updateBackupDot('off');
+  refreshBackupPanel();
+  toast('Token removed');
+}
+
+function updateBackupDot(state){
+  const dot=document.getElementById('backup-dot');
+  if(dot) dot.className='backup-dot '+state;
+}
+
+function refreshBackupPanel(){
+  const last=getLastBackup();
+  const lastEl=document.getElementById('backup-last');
+  if(lastEl) lastEl.textContent = last ? new Date(last).toLocaleString() : 'Never';
+  const stateEl=document.getElementById('backup-state');
+  if(stateEl) stateEl.textContent = getGhToken() ? 'Active' : 'Not set up';
+  const countEl=document.getElementById('backup-count');
+  if(countEl) countEl.textContent = `${entries.length} entries on device`;
 }
 
 // ═══════════════════════════════════════════════════
@@ -1030,6 +1242,17 @@ function dismissInstall(){localStorage.setItem('install_dismissed','1');document
 load();
 renderAll();
 checkInstallBanner();
+updateBackupDot(getGhToken() ? 'ok' : 'off');
+refreshBackupPanel();
+
+// If local storage is empty but a GitHub backup exists, pull it in automatically.
+// If local storage already has entries but no token is set up yet, this is a no-op
+// restore attempt (silent) so a fresh device with an existing backup self-heals.
+if (entries.length === 0) {
+  restoreFromGitHub(true).then(restored => {
+    if (restored) updateBackupDot('ok');
+  });
+}
 
 // If a voyage was in progress when the app closed, resume the banner and restart watch
 if (voyage) {
